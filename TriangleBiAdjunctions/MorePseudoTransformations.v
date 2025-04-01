@@ -122,40 +122,28 @@ Definition pstrans_script_pstrans_is_modification
            (τ : pstrans G₁ G₂)
   : is_modification (pstrans_script_pstrans_data σ τ).
 Proof.
-  red.
-  intros X Y f.
-  unfold invertible_modification_data_to_modification_data, pstrans_script_pstrans_data.
-  cbn - [psfunctor_comp].
-
-  (* LHS *)
-  rewrite pstrans_comp_whisker.
-  rewrite 6 ! vassocr.
-  simplify_vcomp2_right.
-  rewrite invertible_2cell_of_rwhisker, invertible_2cell_of_rwhisker_inv.
-  do 2 simplify_vcomp2_right.
-  rewrite vassocl with (z := lwhisker (σ (G₁ X)) (psfunctor_comp F₂ (# G₁ f) (τ Y))).
-  rewrite lwhisker_vcomp.
-  simplify_vcomp2_right.
-
-  (* RHS *)
-  rewrite pstrans_comp_whisker.
-  rewrite 10 ! vassocr.
-  do 2 simplify_vcomp2_right.
-  rewrite invertible_2cell_of_rwhisker with (g := # F₂ (# G₂ f)).
-  rewrite invertible_2cell_of_rwhisker_inv with (g := # F₂ (# G₂ f)).
-  rewrite vcomp_rinv, id2_left.
-  rewrite vassocl with (y := rwhisker (σ (G₂ Y)) ((psfunctor_comp F₁ (τ X) (# G₂ f)) ^-1)%bicategory).
-  rewrite rwhisker_vcomp.
-  rewrite 2 ! vassocr.
-  rewrite vcomp_linv, id2_left.
-
-  rewrite <- lwhisker_vcomp.
-  rewrite vassocr.
-  rewrite vassocl with (y := lwhisker (σ (G₁ X)) (psfunctor_on_cells F₂ (psnaturality_of τ f))).
-  rewrite psnaturality_natural.
-  rewrite <- rwhisker_vcomp.
+  intros X Y f; simpl.
+  rewrite 4 ! vassocl with (x := rassociator (σ (G₁ X)) (# F₂ (τ X)) (# F₂ (# G₂ f))).
+  apply lassociator_to_rassociator_pre.
+  refine (!_).
+  rewrite <- 2 ! rwhisker_vcomp.
   rewrite ! vassocr.
-  reflexivity.
+  apply lassociator_to_rassociator_post.
+  use vcomp_move_R_Mp; is_iso.
+  refine (maponpaths (λ x, x • _) (!_) @ _).
+  { apply (pstrans_comp σ). }
+  refine (!_).
+  rewrite 5 ! vassocl with (x := σ (G₁ X) ◃ _).
+  etrans.
+  {
+    apply maponpaths.
+    refine (!_).
+    apply (pstrans_comp σ).
+  }
+  rewrite vassocr, lwhisker_vcomp.
+  rewrite vassocl, vcomp_linv, id2_right.
+  rewrite <- lwhisker_vcomp, 2 ! vassocl.
+  apply maponpaths, psnaturality_natural.
 Qed.
 
 Definition pstrans_script_pstrans
